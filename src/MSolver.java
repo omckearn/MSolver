@@ -9,7 +9,11 @@ import java.util.Scanner;
  */
 public class MSolver {
 
-    // 2d array representing the board
+    /* 2d array representing the board
+     * -2 for mine
+     * -1 for unrevealed cells
+     * 0-8 for number of adjacent mines
+     */
     private final GridSquare[][] board;
 
     // the number of mines left on the board
@@ -32,16 +36,30 @@ public class MSolver {
         //initialize the board
         board = new GridSquare[rows][columns];
 
+        // initialize list of active squares
+        activeSquares = new ArrayList<>();
+
+
         // fill the board with GridSqaures
         for(int i = 0; i < board.length; i++) {
             for(int j = 0; j< board[i].length; j++) {
+
                 // declare the new board
                 board[i][j] = new GridSquare();
+
                 // populate the boards column and row values
                 board[i][j].column = j;
                 board[i][j].row = i;
             }
         }
+    }
+
+
+    /**
+     * getter method for minesleft field
+     */
+    public int getMines() {
+        return this.minesLeft;
     }
 
 
@@ -72,13 +90,14 @@ public class MSolver {
                 "and 0-8 for number of adjacent mines:");
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                System.out.printf("Enter value for cell (%d, %d): ", i + 1, j + 1);
+                System.out.printf("Enter value for cell (%d, %d): ",
+                        i + 1, j + 1);
                 int cellValue = scanner.nextInt();
                 board[i][j].setValue(cellValue);
+                checkActive(board[i][j]);
             }
         }
     }
-
 
     /**
      * Fills the entire board with values from a single string input.
@@ -95,10 +114,95 @@ public class MSolver {
             for (int j = 0; j < values.length; j++) {
                 int cellValue = Integer.parseInt(values[j]);
                 board[i][j].setValue(cellValue);
+                checkActive(board[i][j]);
             }
         }
     }
 
+    /**
+     * Checks if the square is active (a mine) if true adds it to
+     * list activeSquares
+     * @param curr the square to be checked
+     */
+    private void checkActive(GridSquare curr) {
+        if (curr.value > 0) {
+            activeSquares.add(curr);
+        }
+    }
+
+    /**
+     * Attempts to solve the current board
+     */
+    public void attemptSolve() {
+        boolean change;
+        do {
+            change = false;
+            for(GridSquare curr : activeSquares) {
+                change = solveHelper(curr.getNeighbors(board), curr);
+            }
+        }while(change);
+
+    }
+
+    /**
+     * helper method for attmept solve processes individual GridSquares
+     */
+    private boolean solveHelper(List<GridSquare> neighbors, GridSquare curr) {
+
+        boolean change = false;
+        int numMines = countMines(neighbors);
+        int unrevealed = countUnrevealed(neighbors);
+
+        // case where # of mines = square value
+        // in this case all remaining unrevealed are safe
+        if(numMines == curr.value) {
+            for(GridSquare square : neighbors) {
+                if(square.value == -1) {
+                    square.setValue(-3); // value for cells to be clicked
+                    // click on cell value
+                    change = true;
+                }
+            }
+        }
+
+        // case where #mines + #unrevealed = cell value
+        if(numMines + unrevealed == curr.value) {
+            for(GridSquare square : neighbors) {
+                if(square.value == -1) {
+                    square.setValue(-2); // value for mine
+                    change = true;
+                    minesLeft--;
+                }
+            }
+        }
+        return change;
+    }
+
+    /**
+     * counts and returns the number of GridSquares that are mines
+     * in the passed list
+     * @param list the list to be counted
+     */
+    private int countMines(List<GridSquare> list) {
+        int count = 0;
+        for(GridSquare curr : list) {
+            if(curr.value == -2) {count++;}
+        }
+        return count;
+    }
+
+    /**
+     * counts and returns the number of GridSquares that are unrevealed
+     * in the passed list
+     * @param list the list to be counted
+     */
+    private int countUnrevealed(List<GridSquare> list) {
+        int count = 0;
+        for(GridSquare curr : list) {
+            if(curr.value == -1) {count++;}
+        }
+        return count;
+    }
 
     /**
      * represents a grid square on a minesweeper board
@@ -161,4 +265,3 @@ public class MSolver {
         }
     }
 }
-

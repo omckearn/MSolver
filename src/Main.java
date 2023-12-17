@@ -6,6 +6,10 @@ public class Main {
                 "-1 1 0 0 0 0 0 0\n" +
                         "-1 2 0 0 0 1 1 1 \n" +
                         "-1 2 0 0 0 1 -1 -1");
-        board.printBoard();
+        while(board.getMines() != 0) {
+            board.attemptSolve();
+            board.printBoard();
+            board.fillBoardManually();
+        }
     }
 }
