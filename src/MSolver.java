@@ -2,8 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
-
 /**
  * Used to attempt to solve a user inputted Minesweeper game
  */
@@ -16,11 +14,15 @@ public class MSolver {
      */
     private final GridSquare[][] board;
 
-    // the number of mines left on the board
+    // the number of unflagged mines left on the board
     private int minesLeft;
 
-    // a list of all active gridSquares
+    // a list of all gridSquares that have a current val 1-8
     private ArrayList<GridSquare> activeSquares;
+
+    //Class constants used to represent mines and unrevealed values
+    private final int MINE = -2;
+    private final int UNREVEALED = -1;
 
 
     /**
@@ -62,6 +64,13 @@ public class MSolver {
         return this.minesLeft;
     }
 
+    /**
+     * setter method for minesleft field
+     * @param count the new count
+     */
+    public void setMines(int count) {
+        minesLeft = count;
+    }
 
     /**
      * Prints the board to the console used for debugging
@@ -120,7 +129,7 @@ public class MSolver {
     }
 
     /**
-     * Checks if the square is active (a mine) if true adds it to
+     * Checks if the square is active(has a number1-8) if true adds it to
      * list activeSquares
      * @param curr the square to be checked
      */
@@ -141,7 +150,6 @@ public class MSolver {
                 change = solveHelper(curr.getNeighbors(board), curr);
             }
         }while(change);
-
     }
 
     /**
@@ -150,14 +158,14 @@ public class MSolver {
     private boolean solveHelper(List<GridSquare> neighbors, GridSquare curr) {
 
         boolean change = false;
-        int numMines = countMines(neighbors);
-        int unrevealed = countUnrevealed(neighbors);
+        int numMines = countType(neighbors, MINE);
+        int unrevealed = countType(neighbors, UNREVEALED);
 
         // case where # of mines = square value
         // in this case all remaining unrevealed are safe
         if(numMines == curr.value) {
             for(GridSquare square : neighbors) {
-                if(square.value == -1) {
+                if(square.value == UNREVEALED) {
                     square.setValue(-3); // value for cells to be clicked
                     // click on cell value
                     change = true;
@@ -168,10 +176,10 @@ public class MSolver {
         // case where #mines + #unrevealed = cell value
         if(numMines + unrevealed == curr.value) {
             for(GridSquare square : neighbors) {
-                if(square.value == -1) {
-                    square.setValue(-2); // value for mine
+                if(square.value == UNREVEALED) {
+                    square.setValue(MINE); // value for mine
                     change = true;
-                    minesLeft--;
+                    setMines(getMines() - 1); // updated mine count
                 }
             }
         }
@@ -179,27 +187,15 @@ public class MSolver {
     }
 
     /**
-     * counts and returns the number of GridSquares that are mines
-     * in the passed list
+     * counts and returns the number of GridSquares that are of the
+     * passed type list
      * @param list the list to be counted
+     * @param type the type of square to be counted
      */
-    private int countMines(List<GridSquare> list) {
+    private int countType(List<GridSquare> list, int type){
         int count = 0;
         for(GridSquare curr : list) {
-            if(curr.value == -2) {count++;}
-        }
-        return count;
-    }
-
-    /**
-     * counts and returns the number of GridSquares that are unrevealed
-     * in the passed list
-     * @param list the list to be counted
-     */
-    private int countUnrevealed(List<GridSquare> list) {
-        int count = 0;
-        for(GridSquare curr : list) {
-            if(curr.value == -1) {count++;}
+            if(curr.value == type) {count++;}
         }
         return count;
     }
@@ -207,7 +203,7 @@ public class MSolver {
     /**
      * represents a grid square on a minesweeper board
      */
-    public class GridSquare {
+    private class GridSquare {
         /*
         Represents what the square contains
             -2 for mine
@@ -235,7 +231,6 @@ public class MSolver {
         public void setValue(int val) {
             this.value = val;
         }
-
 
         /**
          * Returns a list of all bordering neighbors
