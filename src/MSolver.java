@@ -24,7 +24,6 @@ public class MSolver {
     private final int MINE = -2;
     private final int UNREVEALED = -1;
 
-
     /**
      * Constructs a new MSolver, populates the board with GridSquares
      * @param rows the number of rows in the board
@@ -55,7 +54,6 @@ public class MSolver {
             }
         }
     }
-
 
     /**
      * getter method for minesleft field
@@ -219,9 +217,6 @@ public class MSolver {
         // stores row index
         private int column;
 
-        /**
-         * GridSquare constructor
-         */
         public GridSquare() {}
 
         /**
