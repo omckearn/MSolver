@@ -14,7 +14,7 @@ public class MSolver {
      */
     private final GridSquare[][] board;
 
-    // the number of unflagged mines left on the board
+    // the number of un-flagged mines left on the board
     private int minesLeft;
 
     // a list of all gridSquares that have a current val 1-8
@@ -151,7 +151,7 @@ public class MSolver {
     }
 
     /**
-     * helper method for attmept solve processes individual GridSquares
+     * helper method for attempt solve processes individual GridSquares
      */
     private boolean solveHelper(List<GridSquare> neighbors, GridSquare curr) {
 
