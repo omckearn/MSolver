@@ -1,7 +1,5 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -9,9 +7,13 @@ import java.util.Random;
  */
 public class MSGame {
 
+    // represents the actual game board
     private int[][] actualBoard;
 
+    // represents what the user will see
     private int[][] userBoard;
+
+    private boolean gameOver;
 
     private int rows;
     private int columns;
@@ -25,6 +27,7 @@ public class MSGame {
      */
     public void MSGame(int firstX, int firstY, int mineCount,
                        int rows, int columns) {
+        this.gameOver = false;
         this.rows = rows;
         this.columns = columns;
         actualBoard = new int[rows][columns];
@@ -32,7 +35,7 @@ public class MSGame {
     }
 
     /**
-     * Genrates the board based on the users first click
+     * Generates the game boards based on the users first click
      * @param firstX x cord of first click, must be within board bounds
      * @param firstY cord of first click, must be within board bounds
      * @param mineCount the number of mines on the board
@@ -46,12 +49,14 @@ public class MSGame {
             actualBoard[curr[0]][curr[1]] = MINE;
         }
 
-        // fill out board for non-mine squares
         for(int i = 0; i < rows; i++) {
             for(int j = 0; j < columns; j++) {
-                // case where we have a none mine square
+                // populate user board
+                userBoard[i][j] = -1;
+
+                // populate game board
                 int count  = 0;
-                if(actualBoard[i][j] != MINE) {
+                if(actualBoard[i][j] != MINE) { // populate game board
                     ArrayList<int[]> neighbors = getNeighbors(i, j);
                     for(int[] curr: neighbors) {
                         if(actualBoard[curr[0]][curr[1]] == MINE) {
@@ -62,8 +67,7 @@ public class MSGame {
                 actualBoard[i][j] = count;
             }
         }
-
-
+        // get user click somehow userBoard[firstX][firstY] =
     }
 
     /**
@@ -72,12 +76,12 @@ public class MSGame {
      * @param mineCount the number of pairs to be generated
      */
     private HashSet<int[]> generateMines(int[] firstClick, int mineCount) {
-
         // list of pairs
         HashSet<int[]> minePairs = new HashSet<>();
 
         // add the user input to the set now so it can't add randomly later
         minePairs.add(firstClick);
+
         Random random = new Random();
         while(minePairs.size() >= mineCount) {
             int x = random.nextInt(rows + 1);
@@ -88,7 +92,6 @@ public class MSGame {
 
         // remove the first click you added before
         minePairs.remove(firstClick);
-
         return minePairs;
     }
 
@@ -116,5 +119,54 @@ public class MSGame {
             }
         }
         return neighbors;
+    }
+
+    /**
+     *
+     */
+    private void userSolve() {
+        while(!gameOver) {
+            //userClick();
+            if(userBoard == actualBoard) {
+                gameOver = true;
+            }
+        }
+    }
+
+
+    /**
+     *
+     * @param x x coordinate of click
+     * @param y y coordinate of click
+     */
+    private void userClick(int x, int y) {
+        if(actualBoard[x][y] != MINE) {
+            userBoard[x][y] = actualBoard[x][y];
+            if(userBoard[x][y] == 0) {
+                revealZeros(x,y);
+            }
+        }else {
+            gameOver = true;
+        }
+    }
+
+    /**
+     * In Minesweeper, a single click on an empty square
+     * (a square without adjacent mines) can reveal a contiguous area of empty
+     * squares, extending until it reaches squares adjacent to mines. This
+     * method does this for a empty square
+     * @param x y index of square
+     * @param y x index of square
+     */
+    private void revealZeros(int x, int y) {
+        ArrayList<int[]> neighbors = getNeighbors(x,y);
+        for(int[] curr : neighbors) {
+            int row = curr[0];
+            int column = curr[1];
+            if(actualBoard[row][column] == 0) {
+                userBoard[row][column] = 0;
+                revealZeros(row, column);
+            }
+        }
     }
 }
