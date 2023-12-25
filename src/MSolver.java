@@ -12,7 +12,7 @@ public class MSolver {
      * -1 for unrevealed cells
      * 0-8 for number of adjacent mines
      */
-    private final GridSquare[][] board;
+    private GridSquare[][] board;
 
     // the number of un-flagged mines left on the board
     private int minesLeft;
@@ -41,7 +41,7 @@ public class MSolver {
         activeSquares = new ArrayList<>();
 
 
-        // fill the board with GridSqaures
+        // fill the board with GridSquares
         for(int i = 0; i < board.length; i++) {
             for(int j = 0; j< board[i].length; j++) {
 
@@ -56,14 +56,14 @@ public class MSolver {
     }
 
     /**
-     * getter method for minesleft field
+     * getter method for minesLeft field
      */
     public int getMines() {
         return this.minesLeft;
     }
 
     /**
-     * setter method for minesleft field
+     * setter method for minesLeft field
      * @param count the new count
      */
     public void setMines(int count) {
@@ -151,7 +151,7 @@ public class MSolver {
     }
 
     /**
-     * helper method for attempt solve processes individual GridSquares
+     * helper method for attemptSolve processes individual GridSquares
      */
     private boolean solveHelper(List<GridSquare> neighbors, GridSquare curr) {
 
@@ -231,7 +231,7 @@ public class MSolver {
          * Returns a list of all bordering neighbors
          * @param board the board
          */
-        public List<GridSquare> getNeighbors(GridSquare[][] board) {
+        private List<GridSquare> getNeighbors(GridSquare[][] board) {
             List<GridSquare> neighbors = new ArrayList<>();
 
             int numRows = board.length;
