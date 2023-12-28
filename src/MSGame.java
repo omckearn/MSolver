@@ -121,17 +121,6 @@ public class MSGame {
         return neighbors;
     }
 
-    /**
-     *
-     */
-    private void userSolve() {
-        while(!gameOver) {
-            //userClick();
-            if(userBoard == actualBoard) {
-                gameOver = true;
-            }
-        }
-    }
 
 
     /**
